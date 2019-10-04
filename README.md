@@ -117,7 +117,13 @@ docker push <registry host|IP:5000>/tc-docker-image-builder
 Test the image can run
 
 # Notes
-Clean up all exited containers:
 ```
+#Clean up all exited containers:
 docker container rm $(docker container ls -q -f 'status=exited')
+
+#Check registry for images:
+curl -k -X GET https://10.0.0.112:5000/v2/_catalog
+
+#Check image in registry for tags:
+curl -k -X GET https://10.0.0.112:5000/v2/buildtest/tags/list
 ```
