@@ -5,7 +5,9 @@ I wanted to try to setup TeamCity in a container, then run agents is Docker cont
   Get Linux on a host machine
   Install docker (curl https://get.docker.-com -output get_docker.sh && sh get_docker.sh)
   Pull teamcity docker image
-  > docker pull jetbrains/teamcity:latest
+  ```
+  docker pull jetbrains/teamcity:latest
+  ```
  
   Setup Teamcity acount and so on.
  
@@ -16,10 +18,14 @@ I wanted to try to setup TeamCity in a container, then run agents is Docker cont
   
 ##  Method 1 (if you want to use IP addresses):
   Edit the file /etc/ssl/openssl.cnf on the registry:2 host and add
+  ```
     [ v3_ca ]
         subjectAltName = IP:10.10.10.20
+  ```
   or:
+  ```
         subjectAltName = DNS:registry.mydomain.lan,IP:10.10.10.20,IP:127.0.0.1
+  ```
     
   Then generate the certificates.  After the keys are generated, clean up the /etc/ssl/openssl.cnf file again.
 
@@ -27,15 +33,26 @@ I wanted to try to setup TeamCity in a container, then run agents is Docker cont
   Do nothing
      
 ##  Generate certificates (both Method 1 and 2):
+```bash
   openssl req \
     -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key \
     -x509 -days 365 -out certs/domain.crt
+```
 
   Be sure to use the host name like "registry.home.lan" as a CN (common name).
 
 ## Setup the docker host to use the certificates
  Linux: Copy the domain.crt file to /etc/docker/certs.d/myregistrydomain.com:5000/ca.crt on every Docker host.
  You do not need to restart Docker.
-
+```bash
   sudo mkdir -p /etc/docker/certs.d/10.0.0.112:5000
   sudo scp kpo@10.0.0.112:/home/kpo/development/teamcity-docker/dockerfiles/docker-registry/certs/domain.crt /etc/docker/certs.d/10.0.0.112:5000/ca.crt
+```
+  
+## Test the registry works
+```bash
+ docker pull ubuntu:16.04
+ docker tag ubuntu:16.04 myregistrydomain.com/my-ubuntu
+ docker push myregistrydomain.com/my-ubuntu
+ docker pull myregistrydomain.com/my-ubuntu
+```
