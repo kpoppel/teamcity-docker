@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+  teamcity:
+    container_name: teamcity-server-instance
+    image: jetbrains/teamcity-server:latest
+    ports:
+      - 8111:8111
+    volumes:
+      - ./data:/data/teamcity_server/datadir
+      - ./logs:/opt/teamcity/logs
+ 

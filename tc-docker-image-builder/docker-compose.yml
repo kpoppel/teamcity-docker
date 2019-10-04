@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+  teamcity-agent:
+      image: 10.0.0.112:5000/tc-docker-image-builder:latest
+      build: ./
+      environment:
+        SERVER_URL: http://10.0.0.112:8111
+      volumes:
+  #      - teamcity-agent-conf:/data/teamcity_agent/conf
+  #      - /opt/buildagent/work:/opt/buildagent/work
+  #      - /opt/buildagent/temp:/opt/buildagent/temp
+        - /var/run/docker.sock:/var/run/docker.sock
