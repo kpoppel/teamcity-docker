@@ -9,9 +9,18 @@ I wanted to try to setup TeamCity in a container, then run agents is Docker cont
   docker pull jetbrains/teamcity:latest
   ```
  
+  Start TeamCity using the scripts in teamcity directory
   Setup Teamcity acount and so on.
+  
+  Install the https://plugins.jetbrains.com/plugin/9306-docker-cloud/ plugin into TeamCity.
+  
+  Create a project and add a cloud config to it.
+  
+  
+## Step 2: Agents on docker host
+  Next we want to run an agent in a cloud
  
-# Step 2: Setup a docker registry.
+# Step 3: Setup a docker registry.
   Pull the registry.  Use he compose file: docker-registry/docker-compose-yml
   Generate TLS keys.  I just wanted to use IP addresses to access the registry, which meant some more work.
   If you have a DNS already setup, go for method 2.
