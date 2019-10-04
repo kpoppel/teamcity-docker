@@ -1,33 +1,41 @@
 # teamcity-docker
 I wanted to try to setup TeamCity in a container, then run agents is Docker containers, and have those containers build me docker images.
 
-Step 1: TeamCity
+# Step 1: TeamCity
   Get Linux on a host machine
   Install docker (curl https://get.docker.-com -output get_docker.sh && sh get_docker.sh)
   Pull teamcity docker image
   > docker pull jetbrains/teamcity:latest
  
- Setup Teamcity acount and so on.
+  Setup Teamcity acount and so on.
  
-Step 2: Setup a docker registry.
+# Step 2: Setup a docker registry.
   Pull the registry.  Use he compose file: docker-registry/docker-compose-yml
-  Generate
-  Works with IP addresses (and DNS you don't need the openssl.cnf change):
-# Edit the file /etc/ssl/openssl.cnf on the registry:2 host and add
-#  [ v3_ca ]
-#    subjectAltName = IP:10.0.0.112
-#
-# or:
-#    subjectAltName = DNS:registry.mydomain.lan,IP:10.0.0.112,IP:127.0.0.1
+  Generate TLS keys.  I just wanted to use IP addresses to access the registry, which meant some more work.
+  If you have a DNS already setup, go for method 2.
+  
+##  Method 1 (if you want to use IP addresses):
+  Edit the file /etc/ssl/openssl.cnf on the registry:2 host and add
+    [ v3_ca ]
+        subjectAltName = IP:10.10.10.20
+  or:
+        subjectAltName = DNS:registry.mydomain.lan,IP:10.10.10.20,IP:127.0.0.1
+    
+  Then generate the certificates.  After the keys are generated, clean up the /etc/ssl/openssl.cnf file again.
 
-openssl req \
-  -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key \
-  -x509 -days 365 -out certs/domain.crt \
+##  Method 2 (if you have a DNS):
+  Do nothing
+     
+##  Generate certificates (both Method 1 and 2):
+  openssl req \
+    -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key \
+    -x509 -days 365 -out certs/domain.crt
 
-# Clean up /etc/ssl/openssl.cnf file again.
+  Be sure to use the host name like "registry.home.lan" as a CN (common name).
 
-# Be sure to use the host name like "registry.home.lan" as a CN.
-# Linux: Copy the domain.crt file to /etc/docker/certs.d/myregistrydomain.com:5000/ca.crt on every Docker host.
-# You do not need to restart Docker.
-sudo mkdir -p /etc/docker/certs.d/10.0.0.112:5000
-sudo scp kpo@10.0.0.112:/home/kpo/development/teamcity-docker/dockerfiles/docker-registry/certs/domain.crt /etc/docker/certs.d/10.0.0.112:5000/ca.crt
+## Setup the docker host to use the certificates
+ Linux: Copy the domain.crt file to /etc/docker/certs.d/myregistrydomain.com:5000/ca.crt on every Docker host.
+ You do not need to restart Docker.
+
+  sudo mkdir -p /etc/docker/certs.d/10.0.0.112:5000
+  sudo scp kpo@10.0.0.112:/home/kpo/development/teamcity-docker/dockerfiles/docker-registry/certs/domain.crt /etc/docker/certs.d/10.0.0.112:5000/ca.crt
