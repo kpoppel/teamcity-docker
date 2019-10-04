@@ -34,6 +34,7 @@ I wanted to try to setup TeamCity in a container, then run agents is Docker cont
      
 ##  Generate certificates (both Method 1 and 2):
 ```bash
+  mkdir certs
   openssl req \
     -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key \
     -x509 -days 365 -out certs/domain.crt
